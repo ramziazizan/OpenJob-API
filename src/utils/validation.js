@@ -5,6 +5,11 @@ const validateUser = (data) => Joi.object({
     password: Joi.string().min(6).required(),
 }).unknown(true).validate(data);
 
+const validateLogin = (data) => Joi.object({
+    email: Joi.string().email().required(),
+    password: Joi.string().required(),
+}).unknown(true).validate(data);
+
 const validateCompany = (data) => Joi.object({
     name: Joi.string().required(),
 }).unknown(true).validate(data);
@@ -21,4 +26,4 @@ const validateJob = (data) => Joi.object({
     location: Joi.string().required(),
 }).unknown(true).validate(data);
 
-module.exports = { validateUser, validateCompany, validateCategory, validateJob };
+module.exports = { validateUser, validateLogin, validateCompany, validateCategory, validateJob };

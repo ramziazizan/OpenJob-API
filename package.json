@@ -4,8 +4,10 @@
   "description": "OpenJob RESTful API Submission Dicoding",
   "main": "src/server.js",
   "scripts": {
-  "start": "node src/server.js",
-  "start:dev": "nodemon src/server.js"
+    "start": "node src/server.js",
+    "start:dev": "nodemon src/server.js",
+    "migrate": "node-pg-migrate-esm",
+    "db:clean": "node -r dotenv/config -e \"const { Client } = require('pg'); const client = new Client({ user: process.env.DB_USER || 'postgres', host: process.env.DB_HOST || 'localhost', database: process.env.DB_NAME || 'openjob', password: process.env.DB_PASSWORD || 'postgres', port: process.env.DB_PORT || 5432 }); client.connect().then(() => client.query('TRUNCATE users, profiles, companies, categories, jobs, applications, bookmarks CASCADE')).then(() => { console.log('DATABASE HAS BEEN CLEANED!'); process.exit(0); }).catch(console.error);\""
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
