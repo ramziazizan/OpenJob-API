@@ -2,19 +2,28 @@ require('dotenv').config();
 const { Client } = require('pg');
 
 const client = new Client({
-  user: process.env.DB_USER || 'postgres',
-  host: process.env.DB_HOST || 'localhost',
-  database: 'openjob',
-  password: process.env.DB_PASSWORD || 'postgres',
-  port: process.env.DB_PORT || 5432,
+  user: process.env.PGUSER || 'postgres',
+  host: process.env.PGHOST || 'localhost',
+  database: process.env.PGDATABASE || 'openjob',
+  password: process.env.PGPASSWORD || 'postgres',
+  port: process.env.PGPORT || 5432,
 });
 
 async function forceMigrate() {
   try {
     await client.connect();
-    console.log('Sedang menyuntikkan tabel ke openjob');
+    console.log('Sedang menghapus tabel lama dan menyuntikkan tabel baru ke database');
 
     await client.query(`
+      DROP TABLE IF EXISTS bookmarks CASCADE;
+      DROP TABLE IF EXISTS applications CASCADE;
+      DROP TABLE IF EXISTS jobs CASCADE;
+      DROP TABLE IF EXISTS categories CASCADE;
+      DROP TABLE IF EXISTS companies CASCADE;
+      DROP TABLE IF EXISTS authentications CASCADE;
+      DROP TABLE IF EXISTS users CASCADE;
+      DROP TABLE IF EXISTS documents CASCADE;
+
       CREATE TABLE IF NOT EXISTS users (
         id VARCHAR(50) PRIMARY KEY,
         name VARCHAR(255),
@@ -33,8 +42,7 @@ async function forceMigrate() {
         id VARCHAR(50) PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
         description TEXT,
-        logo TEXT,
-        website TEXT,
+        location VARCHAR(255),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
@@ -74,6 +82,12 @@ async function forceMigrate() {
         job_id VARCHAR(50) REFERENCES jobs(id) ON DELETE CASCADE,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE TABLE IF NOT EXISTS documents (
+        id VARCHAR(50) PRIMARY KEY,
+        filename TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
     

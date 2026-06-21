@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
 const { validateUser, validateLogin } = require('../utils/validation');
+const { getCache, setCache } = require('../cache/cacheService');
 
 const register = async (req, res, next) => {
   try {
@@ -83,12 +84,20 @@ const logout = async (req, res, next) => {
 
 const getUserById = async (req, res, next) => {
   try {
+    const cacheKey = `user_${req.params.id}`;
+    const cached = await getCache(cacheKey);
+    if (cached) {
+      return res.header('X-Data-Source', 'cache').status(200).json({ status: 'success', data: cached });
+    }
+
     const resDb = await db.query(
       'SELECT users.id, profiles.full_name AS name, users.email, users.role FROM users LEFT JOIN profiles ON users.id = profiles.user_id WHERE users.id = $1',
       [req.params.id]
     );
     if (resDb.rows.length === 0) return res.status(404).json({ status: 'failed', message: 'Tidak ditemukan' });
-    return res.status(200).json({ status: 'success', data: resDb.rows[0] });
+
+    await setCache(cacheKey, resDb.rows[0], 1800);
+    return res.header('X-Data-Source', 'database').status(200).json({ status: 'success', data: resDb.rows[0] });
   } catch (err) { next(err); }
 };
 

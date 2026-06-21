@@ -10,16 +10,21 @@
     "db:clean": "node -r dotenv/config -e \"const { Client } = require('pg'); const client = new Client({ user: process.env.DB_USER || 'postgres', host: process.env.DB_HOST || 'localhost', database: process.env.DB_NAME || 'openjob', password: process.env.DB_PASSWORD || 'postgres', port: process.env.DB_PORT || 5432 }); client.connect().then(() => client.query('TRUNCATE users, profiles, companies, categories, jobs, applications, bookmarks CASCADE')).then(() => { console.log('DATABASE HAS BEEN CLEANED!'); process.exit(0); }).catch(console.error);\""
   },
   "dependencies": {
+    "amqplib": "^2.0.1",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.6",
-    "dotenv": "^16.4.5",
+    "dotenv": "^16.6.1",
     "express": "^4.19.2",
+    "ioredis": "^5.11.1",
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.3",
+    "multer": "^2.2.0",
     "nanoid": "^5.1.11",
     "node-pg-migrate": "^7.4.0",
-    "pg": "^8.11.5"
+    "nodemailer": "^9.0.0",
+    "pg": "^8.11.5",
+    "redis": "^6.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.1"
